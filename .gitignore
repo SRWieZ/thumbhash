@@ -16,6 +16,3 @@ composer.lock
 /logs/
 /cache/
 
-# Ignore PHPUnit and Codeception configuration files
-phpunit.xml
-codeception.yml
