@@ -1,2 +1,38 @@
 {
+  "name": "srwiez/thumbhash",
+  "description": "A brief description of your package",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Eser DENIZ",
+      "email": "srwiez@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^8.1"
+  },
+  "autoload": {
+    "files": ["src/helpers.php"],
+    "psr-4": {
+      "Thumbhash\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require-dev": {
+    "pestphp/pest": "^2.2",
+    "ext-imagick": "*",
+    "ext-gd": "*"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
 }

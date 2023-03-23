@@ -1,0 +1,21 @@
+# Ignore vendor directory
+/vendor
+
+# Ignore composer.lock file
+composer.lock
+
+# Ignore .env file (if used)
+.env
+
+# Ignore IDE-specific files and directories
+.idea/
+.vscode/
+*.sublime-*
+
+# Ignore log and cache directories
+/logs/
+/cache/
+
+# Ignore PHPUnit and Codeception configuration files
+phpunit.xml
+codeception.yml
