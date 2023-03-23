@@ -1,5 +1,6 @@
 # Thumbhash PHP
-[![Tests](https://github.com/kornrunner/php-blurhash/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/kornrunner/php-blurhash/actions/workflows/tests.yml) [![Coverage Status](https://coveralls.io/repos/github/kornrunner/php-blurhash/badge.svg?branch=master)](https://coveralls.io/github/kornrunner/php-blurhash?branch=master) [![Latest Stable Version](https://poser.pugx.org/kornrunner/blurhash/v/stable)](https://packagist.org/packages/kornrunner/blurhash)
+[![Tests](https://github.com/SRWieZ/thumbhash/actions/workflows/tests.yml/badge.svg)](https://github.com/SRWieZ/thumbhash/actions/workflows/tests.yml)
+[![Latest Stable Version](https://poser.pugx.org/srwiez/thumbhash/v/stable)](https://packagist.org/packages/srwiez/thumbhash)
 
 Thumbhash PHP is a PHP library for generating unique, human-readable identifiers from image files. It is inspired by [Evan Wallace's Thumbhash algorithm](https://github.com/evanw/thumbhash) and provides a PHP implementation of the algorithm.
 
