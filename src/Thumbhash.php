@@ -140,6 +140,10 @@ class Thumbhash
         return rtrim(base64_encode(implode(array_map("chr", $hash))), '=');
     }
 
+    public static function convertStringToHash(string $str): array
+    {
+        return array_map("ord", str_split(base64_decode($str . "=")));
+    }
 
     /**
      * Decodes a ThumbHash to an RGBA image. RGB is not premultiplied by A.
