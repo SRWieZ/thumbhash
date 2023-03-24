@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Compatibility with PHP ^7.3
+- Added convertStringToHash()
 
 ### Fixed
 - Thumbhash::RGBAToHash() instead of Thumbhash::encode()
