@@ -282,7 +282,7 @@ class Thumbhash
      * @param  array  $hash  The bytes of the ThumbHash.
      * @return float The approximate aspect ratio (i.e. width / height).
      */
-    public static function toApproximateAspectRatio(array $hash): float|int
+    public static function toApproximateAspectRatio(array $hash)
     {
         $header = $hash[3];
         $hasAlpha = $hash[2] & 0x80;

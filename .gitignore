@@ -15,4 +15,5 @@ composer.lock
 # Ignore log and cache directories
 /logs/
 /cache/
+.phpunit.result.cache
 
