@@ -27,7 +27,7 @@ foreach ($test_images as $test_image) {
     $content = file_get_contents($path);
 
     list($width, $height, $pixels) = extract_size_and_pixels_with_imagick($content);
-    $hash = Thumbhash::encode($width, $height, $pixels);
+    $hash = Thumbhash::RGBAToHash($width, $height, $pixels);
 
     $thumbBase64 = rtrim(base64_encode(implode(array_map("chr", $hash))), '=');
     $data_url = Thumbhash::toDataURL($hash);

@@ -23,6 +23,7 @@ composer require srwiez/thumbhash
 To generate a thumbhash for an image file, you can use the Thumbhash\Thumbhash class:
 
 Example to show a thumbhash image from a local file
+
 ```php
 use Thumbhash\Thumbhash;
 
@@ -30,7 +31,7 @@ $content = file_get_contents($url);
 
 list($width, $height, $pixels) = extract_size_and_pixels_with_imagick($content);
 
-$hash = Thumbhash::encode($width, $height, $pixels);
+$hash = Thumbhash::RGBAToHash($width, $height, $pixels);
 $key = Thumbhash::convertHashToString($hash); // You can store this in your database as a string
 $url = Thumbhash::toDataURL($hash);
 

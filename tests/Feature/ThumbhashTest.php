@@ -9,7 +9,7 @@ test('it returns the correct hash', function ($url, $hash) {
 
     list($width, $height, $pixels) = extract_size_and_pixels_with_imagick($content);
 
-    $encoded = Thumbhash::encode($width, $height, $pixels);
+    $encoded = Thumbhash::RGBAToHash($width, $height, $pixels);
     $encodedBase64 = Thumbhash::convertHashToString($encoded);
 
     expect($encodedBase64)->toBe($hash);

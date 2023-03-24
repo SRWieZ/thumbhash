@@ -13,7 +13,7 @@ class Thumbhash
      * @returns array The ThumbHash as an array.
      */
 
-    public static function encode($w, $h, $rgba)
+    public static function RGBAToHash($w, $h, $rgba)
     {
         // Encoding an image larger than 100x100 is slow with no benefit
         if ($w > 100 || $h > 100) {
