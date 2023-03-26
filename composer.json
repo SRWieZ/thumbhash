@@ -1,19 +1,20 @@
 {
-  "name": "srwiez/thumbhash",
+  "name": "jerrywham/thumbhash",
   "description": "A brief description of your package",
   "type": "library",
   "license": "MIT",
   "authors": [
     {
       "name": "Eser DENIZ",
-      "email": "srwiez@gmail.com"
+      "email": "srwiez@gmail.com",
+      "name": "Cyril MAGUIRE",
+      "email": "github@ecyseo.net"
     }
   ],
   "require": {
     "php": "^7.3 || ^8.0"
   },
   "autoload": {
-    "files": ["src/helpers.php"],
     "psr-4": {
       "Thumbhash\\": "src/"
     }
