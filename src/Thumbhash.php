@@ -4,6 +4,102 @@ namespace Thumbhash;
 
 class Thumbhash
 {
+
+    private $content;
+    private $width;
+    private $height;
+    private $pixels;
+    private $hash;
+    private $key;
+    private $url;
+
+    function __construct(string $file)
+    {
+        
+        $this->content = file_get_contents($file);
+        if (class_exists('Imagick')) {
+            list($this->width, $this->height, $this->pixels) = $this->extract_size_and_pixels_with_imagick($this->content);
+        } else {
+            list($this->width, $this->height, $this->pixels) = $this->extract_size_and_pixels_with_gd($this->content);
+        }
+
+        $this->hash = $this->RGBAToHash($this->width, $this->height, $this->pixels);
+        $this->key = $this->convertHashToString($this->hash); // You can store this in your database as a string
+    }
+
+
+
+    private function extract_size_and_pixels_with_gd($content): array
+    {
+        $image = imagecreatefromstring($content);
+
+        $width = imagesx($image);
+        $height = imagesy($image);
+
+        $pixels = [];
+        for ($y = 0; $y < $height; $y++) {
+            for ($x = 0; $x < $width; $x++) {
+                $color_index = imagecolorat($image, $x, $y);
+                $color = imagecolorsforindex($image, $color_index);
+                $alpha = 255 - ceil($color['alpha'] * (255 / 127)); // GD only supports 7-bit alpha channel
+                $pixels[] = $color['red'];
+                $pixels[] = $color['green'];
+                $pixels[] = $color['blue'];
+                $pixels[] = $alpha;
+            }
+        }
+        // $size = max($width, $height);
+        // $width = round(100 * $width / $size);
+        // $height = round(100 * $height / $size);
+
+        return [$width, $height, $pixels];
+    }
+
+    /**
+     * @throws \ImagickException
+     * @throws \ImagickPixelException
+     */
+    private function extract_size_and_pixels_with_imagick($content): array
+    {
+        $image = new Imagick();
+        $image->readImageBlob($content);
+
+        $width = $image->getImageWidth();
+        $height = $image->getImageHeight();
+
+        $pixels = [];
+        for ($y = 0; $y < $height; $y++) {
+            for ($x = 0; $x < $width; $x++) {
+
+                $pixel = $image->getImagePixelColor($x, $y);
+                $colors = $pixel->getColor(2);
+                $pixels[] = $colors['r'];
+                $pixels[] = $colors['g'];
+                $pixels[] = $colors['b'];
+                $pixels[] = $colors['a'];
+            }
+        }
+        return [$width, $height, $pixels];
+    }
+
+
+
+
+    public function getWidth()
+    {
+        return $this->width;
+    }
+
+    public function getHeight()
+    {
+        return $this->height;
+    }
+
+    public function getHash()
+    {
+        return $this->hash;
+    }
+
     /**
      * Encodes an RGBA image to a ThumbHash. RGB should not be premultiplied by A.
      *
@@ -13,7 +109,7 @@ class Thumbhash
      * @returns array The ThumbHash as an array.
      */
 
-    public static function RGBAToHash($w, $h, $rgba)
+    private function RGBAToHash($w, $h, $rgba)
     {
         // Encoding an image larger than 100x100 is slow with no benefit
         if ($w > 100 || $h > 100) {
@@ -64,10 +160,10 @@ class Thumbhash
 
         // var_dump($l, $p, $q, $a);
         // Encode using the DCT into DC (constant) and normalized AC (varying) terms
-        list($l_dc, $l_ac, $l_scale) = static::encodeChannel($l, max(3, $lx), max(3, $ly), $w, $h);
-        list($p_dc, $p_ac, $p_scale) = static::encodeChannel($p, 3, 3, $w, $h);
-        list($q_dc, $q_ac, $q_scale) = static::encodeChannel($q, 3, 3, $w, $h);
-        list($a_dc, $a_ac, $a_scale) = $hasAlpha ? static::encodeChannel($a, 5, 5, $w, $h) : [0,0,0];
+        list($l_dc, $l_ac, $l_scale) = $this->encodeChannel($l, max(3, $lx), max(3, $ly), $w, $h);
+        list($p_dc, $p_ac, $p_scale) = $this->encodeChannel($p, 3, 3, $w, $h);
+        list($q_dc, $q_ac, $q_scale) = $this->encodeChannel($q, 3, 3, $w, $h);
+        list($a_dc, $a_ac, $a_scale) = $hasAlpha ? $this->encodeChannel($a, 5, 5, $w, $h) : [0,0,0];
 
         $isLandscape = $w > $h;
         $header24 = round(63 * $l_dc) | (round(31.5 + 31.5 * $p_dc) << 6) | (round(31.5 + 31.5 * $q_dc) << 12) | (round(31 * $l_scale) << 18) | ($hasAlpha << 23);
@@ -99,7 +195,7 @@ class Thumbhash
      * Encode a channel using the Discrete Cosine Transform (DCT)
      * into DC (constant) and normalized AC (varying) terms.
      */
-    public static function encodeChannel($channel, $nx, $ny, $w, $h)
+    private function encodeChannel($channel, $nx, $ny, $w, $h)
     {
         $dc = 0;
         $ac = [];
@@ -135,12 +231,12 @@ class Thumbhash
         return [$dc, $ac, $scale];
     }
 
-    public static function convertHashToString(array $hash): string
+    private function convertHashToString(array $hash): string
     {
         return rtrim(base64_encode(implode(array_map("chr", $hash))), '=');
     }
 
-    public static function convertStringToHash(string $str): array
+    private function convertStringToHash(string $str): array
     {
         return array_map("ord", str_split(base64_decode($str . "=")));
     }
@@ -151,7 +247,7 @@ class Thumbhash
      * @param  array  $hash  The bytes of the ThumbHash.
      * @return array The width, height, and pixels of the rendered placeholder image.
      */
-    public static function hashToRGBA(array $hash): array
+    private function hashToRGBA(array $hash): array
     {
         // Read the constants
         $header24 = $hash[0] | ($hash[1] << 8) | ($hash[2] << 16);
@@ -187,7 +283,7 @@ class Thumbhash
         $q_ac = $decodeChannel(3, 3, $q_scale * 1.25);
         $a_ac = $hasAlpha ? $decodeChannel(5, 5, $a_scale) : null;
         // Decode using the DCT into RGB
-        $ratio = static::toApproximateAspectRatio($hash);
+        $ratio = $this->toApproximateAspectRatio($hash);
         $w = round($ratio > 1 ? 32 : 32 * $ratio);
         $h = round($ratio > 1 ? 32 / $ratio : 32);
         $rgba = [];
@@ -255,7 +351,7 @@ class Thumbhash
      * @param  array  $hash  The bytes of the ThumbHash.
      * @return array The RGBA values for the average color. Each value ranges from 0 to 1.
      */
-    function toAverageRGBA(array $hash): array
+    private function toAverageRGBA(array $hash): array
     {
         $header = $hash[0] | ($hash[1] << 8) | ($hash[2] << 16);
         $l = ($header & 63) / 63;
@@ -282,7 +378,7 @@ class Thumbhash
      * @param  array  $hash  The bytes of the ThumbHash.
      * @return float The approximate aspect ratio (i.e. width / height).
      */
-    public static function toApproximateAspectRatio(array $hash)
+    private function toApproximateAspectRatio(array $hash)
     {
         $header = $hash[3];
         $hasAlpha = $hash[2] & 0x80;
@@ -303,7 +399,7 @@ class Thumbhash
      * @param $rgba String The pixels in the input image, row-by-row. Must have w*h*4 elements.
      * @returns String A data URL containing a PNG for the input image.
      */
-    public static function rgbaToDataURL(int $w, int $h, $rgba)
+    private function rgbaToDataURL(int $w, int $h, $rgba)
     {
         $row = $w * 4 + 1;
         $idat = 6 + $h * (5 + $row);
@@ -372,11 +468,17 @@ class Thumbhash
      * @param array $hash The bytes of the ThumbHash.
      * @returns array A data URL containing a PNG for the rendered ThumbHash.
      */
-    public static function toDataURL(array $hash): string
+    public function toDataURL(array $hash): string
     {
-        $image = static::hashToRGBA($hash);
+        $image = $this->hashToRGBA($hash);
 
-        return static::rgbaToDataURL($image['w'], $image['h'], $image['rgba']);
+        return $this->rgbaToDataURL($image['w'], $image['h'], $image['rgba']);
+    }
+
+    public function displayThumbhash(string $alt='', string $class='', string $id='', string $data='')
+    {
+        $this->url = $this->toDataURL($this->hash);
+        return '<img src="' . $this->url . '"'.($class!=''? ' class="'.$class.'"':'').($id!=''? ' id="'.$id.'"':'').($data!=''? ' '.$data:'').' />';
     }
 
 }
