@@ -13,7 +13,7 @@ Thumbhash is a very compact representation of a placeholder for an image. Store 
 You can install Thumbhash PHP using Composer:
 
 ```bash
-composer require srwiez/thumbhash
+composer require jerrywham/thumbhash
 ```
 
 ⚠️ I higly recommand to have Imagick extension installed on your computer. GD extension has only 7 bits of alpha channel resolution, and 127 is transparent, 0 opaque. While the library will still work, you may have different image between platforms. [See on stackoverflow](https://stackoverflow.com/questions/41079110/is-it-possible-to-retrieve-the-alpha-value-of-a-pixel-of-a-png-file-in-the-0-255)
@@ -27,20 +27,18 @@ Example to show a thumbhash image from a local file
 ```php
 use Thumbhash\Thumbhash;
 
-$content = file_get_contents($url);
+$Th = new Thumbhash($url);
 
-list($width, $height, $pixels) = extract_size_and_pixels_with_imagick($content);
+$thumbBase64 = rtrim(base64_encode(implode(array_map("chr", $Th->getHash() ))), '=');
+$data_url = $Th->toDataURL($Th->getHash() );
 
-$hash = Thumbhash::RGBAToHash($width, $height, $pixels);
-$key = Thumbhash::convertHashToString($hash); // You can store this in your database as a string
-$url = Thumbhash::toDataURL($hash);
-
-echo '<img src="' . $url . '" />';
+echo '<img style="width: 200px; height: auto; border: 1px solid black;" width="'. $Th->getWidth() .'" height="'. $Th->getHeight() .'" src="'. $data_url .'" alt="">';
 ```
 
 ## Credits
 
 Thumbhash PHP was created by Eser DENIZ. 
+Modify by Cyril MAGUIRE.
 
 It is inspired by the javascript version of [Evan Wallace's Thumbhash algorithm](https://github.com/evanw/thumbhash).
 
