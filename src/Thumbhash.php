@@ -2,7 +2,7 @@
 
 namespace Thumbhash;
 
-class Thumbhash
+final class Thumbhash
 {
 
     private $content;
