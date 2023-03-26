@@ -29,7 +29,7 @@ final class Thumbhash
 
 
 
-    private function extract_size_and_pixels_with_gd($content): array
+    private function extract_size_and_pixels_with_gd(string $content): array
     {
         $image = imagecreatefromstring($content);
 
@@ -59,7 +59,7 @@ final class Thumbhash
      * @throws \ImagickException
      * @throws \ImagickPixelException
      */
-    private function extract_size_and_pixels_with_imagick($content): array
+    private function extract_size_and_pixels_with_imagick(string $content): array
     {
         $image = new Imagick();
         $image->readImageBlob($content);
@@ -82,20 +82,17 @@ final class Thumbhash
         return [$width, $height, $pixels];
     }
 
-
-
-
-    public function getWidth()
+    public function getWidth(): int
     {
         return $this->width;
     }
 
-    public function getHeight()
+    public function getHeight(): int
     {
         return $this->height;
     }
 
-    public function getHash()
+    public function getHash(): array
     {
         return $this->hash;
     }
@@ -109,7 +106,7 @@ final class Thumbhash
      * @returns array The ThumbHash as an array.
      */
 
-    private function RGBAToHash($w, $h, $rgba)
+    private function RGBAToHash(int $w, int $h, array $rgba): array
     {
         // Encoding an image larger than 100x100 is slow with no benefit
         if ($w > 100 || $h > 100) {
@@ -195,7 +192,7 @@ final class Thumbhash
      * Encode a channel using the Discrete Cosine Transform (DCT)
      * into DC (constant) and normalized AC (varying) terms.
      */
-    private function encodeChannel($channel, $nx, $ny, $w, $h)
+    private function encodeChannel(array $channel, int $nx, int $ny, int $w, int $h): array
     {
         $dc = 0;
         $ac = [];
@@ -378,7 +375,7 @@ final class Thumbhash
      * @param  array  $hash  The bytes of the ThumbHash.
      * @return float The approximate aspect ratio (i.e. width / height).
      */
-    private function toApproximateAspectRatio(array $hash)
+    private function toApproximateAspectRatio(array $hash): float
     {
         $header = $hash[3];
         $hasAlpha = $hash[2] & 0x80;
@@ -399,7 +396,7 @@ final class Thumbhash
      * @param $rgba String The pixels in the input image, row-by-row. Must have w*h*4 elements.
      * @returns String A data URL containing a PNG for the input image.
      */
-    private function rgbaToDataURL(int $w, int $h, $rgba)
+    private function rgbaToDataURL(int $w, int $h, array $rgba): string
     {
         $row = $w * 4 + 1;
         $idat = 6 + $h * (5 + $row);
@@ -475,7 +472,7 @@ final class Thumbhash
         return $this->rgbaToDataURL($image['w'], $image['h'], $image['rgba']);
     }
 
-    public function displayThumbhash(string $alt='', string $class='', string $id='', string $data='')
+    public function displayThumbhash(string $alt='', string $class='', string $id='', string $data=''): string
     {
         $this->url = $this->toDataURL($this->hash);
         return '<img src="' . $this->url . '"'.($class!=''? ' class="'.$class.'"':'').($id!=''? ' id="'.$id.'"':'').($data!=''? ' '.$data:'').' />';
