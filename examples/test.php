@@ -1,10 +1,8 @@
 <?php
 
 use Thumbhash\Thumbhash;
-use function Thumbhash\extract_size_and_pixels_with_gd;
-use function Thumbhash\extract_size_and_pixels_with_imagick;
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../src/Thumbhash.php';
 
 $test_images = [
     '../assets/sunrise.jpg',
@@ -24,21 +22,19 @@ echo '<h1 style="text-align: center">Thumbhash examples</h1>
 foreach ($test_images as $test_image) {
     $url = $test_image;
     $path = __DIR__ . '/' . $url;
-    $content = file_get_contents($path);
 
-    list($width, $height, $pixels) = extract_size_and_pixels_with_imagick($content);
-    $hash = Thumbhash::RGBAToHash($width, $height, $pixels);
+    $Th = new Thumbhash($path);
 
-    $thumbBase64 = rtrim(base64_encode(implode(array_map("chr", $hash))), '=');
-    $data_url = Thumbhash::toDataURL($hash);
+    $thumbBase64 = rtrim(base64_encode(implode(array_map("chr", $Th->getHash() ))), '=');
+    $data_url = $Th->toDataURL($Th->getHash() );
     ?>
     <tr>
         <td>
-            <img style="width: 200px; height: auto; border: 1px solid black;" width="<?= $width; ?>" height="<?= $height; ?>" src="<?= $url; ?>" alt="">
-            <br><?= $width; ?> x <?= $height; ?>
+            <img style="width: 200px; height: auto; border: 1px solid black;" width="<?= $Th->getWidth(); ?>" height="<?= $Th->getHeight(); ?>" src="<?= $url; ?>" alt="">
+            <br><?= $Th->getWidth(); ?> x <?= $Th->getHeight(); ?>
         </td>
         <td>
-            <img style="width: 200px; height: auto; border: 1px solid black;" width="<?= $width; ?>" height="<?= $height; ?>" src="<?= $data_url; ?>" alt="">
+            <img style="width: 200px; height: auto; border: 1px solid black;" width="<?= $Th->getWidth(); ?>" height="<?= $Th->getHeight(); ?>" src="<?= $data_url; ?>" alt="">
             <br>
             <br>
             <?= $thumbBase64; ?>
