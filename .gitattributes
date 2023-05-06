@@ -1,0 +1,7 @@
+.gitattributes export-ignore
+.github/ export-ignore
+.gitignore export-ignore
+.idea export-ignore
+tests/ export-ignore
+examples/ export-ignore
+assets/ export-ignore
