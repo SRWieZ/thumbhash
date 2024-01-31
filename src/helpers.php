@@ -4,9 +4,23 @@ namespace Thumbhash;
 
 use Imagick;
 
+/**
+ * Extract image data using the GD extension.
+ *
+ * GD only provides 127-bit alpha data, so this up-scales it to 255 bits.
+ *
+ * @param  string  $content  The binary data of the image to be processed.
+ * @return array An array containing the width, height, and pixel data of the image.
+ * @throws Exception
+ */
 function extract_size_and_pixels_with_gd($content): array
 {
     $image = imagecreatefromstring($content);
+
+    if ($image === false) {
+        throw new \Exception("Unable to read data, make sure that the appropriate " .
+                             "image type support is enabled in GD.");
+    }
 
     $width = imagesx($image);
     $height = imagesy($image);
