@@ -11,7 +11,7 @@ use Imagick;
  *
  * @param  string  $content  The binary data of the image to be processed.
  * @return array An array containing the width, height, and pixel data of the image.
- * @throws Exception
+ * @throws \Exception
  */
 function extract_size_and_pixels_with_gd($content): array
 {
@@ -19,7 +19,7 @@ function extract_size_and_pixels_with_gd($content): array
 
     if ($image === false) {
         throw new \Exception("Unable to read data, make sure that the appropriate " .
-                             "image type support is enabled in GD.");
+            "image type support is enabled in GD.");
     }
 
     $width = imagesx($image);
