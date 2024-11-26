@@ -1,7 +1,7 @@
 name: Tests
 
 on:
-  pull_request: ~
+  pull_request:
   push:
     branches:
       - master
@@ -9,7 +9,10 @@ on:
 jobs:
   ci:
     runs-on: ${{ matrix.os }}
+
+
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest]
         php: [7.3, 7.4, 8.1, 8.2, 8.3, 8.4]
@@ -26,7 +29,7 @@ jobs:
           coverage: xdebug
 
       - name: Install Dependencies
-        run: composer install --dev --no-interaction --prefer-dist --optimize-autoloader
+        run: composer update -W --dev --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Run tests
-        run: ./vendor/bin/pest
+        run: ./vendor/bin/pest ${{ matrix.php >= 8.1 && '--display-deprecations' || '' }}
