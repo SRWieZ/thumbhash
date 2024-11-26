@@ -29,7 +29,7 @@ jobs:
           coverage: xdebug
 
       - name: Install Dependencies
-        run: composer update --dev --no-interaction --prefer-dist --optimize-autoloader
+        run: composer update -W --dev --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Run tests
         run: ./vendor/bin/pest --display-deprecations
