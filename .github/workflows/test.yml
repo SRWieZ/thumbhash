@@ -1,7 +1,7 @@
 name: Tests
 
 on:
-  pull_request: ~
+  pull_request:
   push:
     branches:
       - master
@@ -9,6 +9,8 @@ on:
 jobs:
   ci:
     runs-on: ${{ matrix.os }}
+
+
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -26,7 +28,7 @@ jobs:
           coverage: xdebug
 
       - name: Install Dependencies
-        run: composer install --dev --no-interaction --prefer-dist --optimize-autoloader
+        run: composer update --dev --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Run tests
-        run: ./vendor/bin/pest
+        run: ./vendor/bin/pest --display-deprecations
