@@ -4,7 +4,7 @@
 
 Thumbhash PHP is a PHP library for generating unique, human-readable identifiers from image files. It is inspired by [Evan Wallace's Thumbhash algorithm](https://github.com/evanw/thumbhash) and provides a PHP implementation of the algorithm.
 
-Thumbhash is a very compact representation of a placeholder for an image. Store it inline with your data and show it while the real image is loading for a smoother loading experience. It's similar to [BlurHash](https://github.com/woltapp/blurhash) but with some advantages
+Thumbhash is a very compact representation of a placeholder for an image. Store it inline with your data and show it while the real image is loading for a smoother loading experience. It's similar to [BlurHash](https://github.com/woltapp/blurhash) but with some advantages.  Note that if you have large images, you should first resize them to 100x100 or smaller.
 
 [Read more and test it here !](https://evanw.github.io/thumbhash/)
 
@@ -30,6 +30,10 @@ use Thumbhash\Thumbhash;
 $content = file_get_contents($url);
 
 list($width, $height, $pixels) = extract_size_and_pixels_with_imagick($content);
+
+if ($width > 100 || $height > 100) {
+    throw new \LogicException("Hash fails on images larger than 100x100px");
+}
 
 $hash = Thumbhash::RGBAToHash($width, $height, $pixels);
 $key = Thumbhash::convertHashToString($hash); // You can store this in your database as a string
