@@ -38,6 +38,10 @@ $url = Thumbhash::toDataURL($hash);
 echo '<img src="' . $url . '" />';
 ```
 
+> [!NOTE]
+> Like the original library implementation, your image must not exceed 100x100 pixels.
+
+
 ## Credits
 
 Thumbhash PHP was created by Eser DENIZ. 
