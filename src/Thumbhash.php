@@ -275,6 +275,26 @@ class Thumbhash
         ];
     }
 
+    /**
+     * Converts a ThumbHash to a color hex string (e.g. '#fff0f0f0').
+     *
+     * @param  array  $hash  The bytes of the ThumbHash.
+     * @return string The hex color string in the format '#AARRGGBB'.
+     */
+    function toAverageColor(array $hash): string
+    {
+        $rgba = $this->toAverageRGBA($hash);
+
+        // Convert from 0–1 float to 0–255 int
+        $a = (int) round($rgba['a'] * 255);
+        $r = (int) round($rgba['r'] * 255);
+        $g = (int) round($rgba['g'] * 255);
+        $b = (int) round($rgba['b'] * 255);
+
+        // Format as a hex color string: #AARRGGBB
+        return sprintf('#%02X%02X%02X%02X', $a, $r, $g, $b);
+    }
+
 
     /**
      * Extracts the approximate aspect ratio of the original image.
