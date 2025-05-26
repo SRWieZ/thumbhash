@@ -26,7 +26,6 @@ class Thumbhash
         $avg_b = 0;
         $avg_a = 0;
 
-        // TODO : use array_chunk ?
         for ($i = 0, $j = 0; $i < $w * $h; $i++, $j += 4) {
             $alpha = $rgba[$j + 3] / 255;
             $avg_r += $alpha / 255 * $rgba[$j];
@@ -49,7 +48,6 @@ class Thumbhash
         $q = []; // red - green
         $a = []; // alpha
 
-        // TODO : use array_chunk ?
         // Convert the image from RGBA to LPQA (composite atop the average color)
         for ($i = 0, $j = 0; $i < $w * $h; $i++, $j += 4) {
             $alpha = $rgba[$j + 3] / 255;
@@ -255,7 +253,7 @@ class Thumbhash
      * @param  array  $hash  The bytes of the ThumbHash.
      * @return array The RGBA values for the average color. Each value ranges from 0 to 1.
      */
-    function toAverageRGBA(array $hash): array
+    public function toAverageRGBA(array $hash): array
     {
         $header = $hash[0] | ($hash[1] << 8) | ($hash[2] << 16);
         $l = ($header & 63) / 63;
@@ -281,18 +279,18 @@ class Thumbhash
      * @param  array  $hash  The bytes of the ThumbHash.
      * @return string The hex color string in the format '#AARRGGBB'.
      */
-    function toAverageColor(array $hash): string
+    public function toAverageHexAlpha(array $hash): string
     {
         $rgba = $this->toAverageRGBA($hash);
 
         // Convert from 0–1 float to 0–255 int
-        $a = (int) round($rgba['a'] * 255);
         $r = (int) round($rgba['r'] * 255);
         $g = (int) round($rgba['g'] * 255);
         $b = (int) round($rgba['b'] * 255);
+        $a = (int) round($rgba['a'] * 255);
 
-        // Format as a hex color string: #AARRGGBB
-        return sprintf('#%02X%02X%02X%02X', $a, $r, $g, $b);
+        // Format as a hex color string: #RRGGBBAA (standard CSS format)
+        return sprintf('#%02X%02X%02X%02X', $r, $g, $b, $a);
     }
 
 

@@ -24,7 +24,7 @@ test('it returns the correct average color', function ($url, $average_color) {
 
     $encoded = Thumbhash::RGBAToHash($width, $height, $pixels);
 
-    $averageColor = (new Thumbhash)->toAverageColor($encoded);
+    $averageColor = (new Thumbhash)->toAverageHexAlpha($encoded);
 
     expect($averageColor)->toBe($average_color);
 })->with('images_average_color');
