@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        php: [7.3, 7.4, 8.1, 8.2, 8.3, 8.4]
+        php: [7.3, 7.4, 8.1, 8.2, 8.3, 8.4, 8.5]
 
     steps:
       - name: Checkout
@@ -32,4 +32,4 @@ jobs:
         run: composer update -W --dev --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Run tests
-        run: ./vendor/bin/pest ${{ matrix.php >= 8.1 && '--display-deprecations' || '' }}
+        run: ./vendor/bin/pest ${{ matrix.php >= 8.1 && '--fail-on-deprecations' || '' }}
