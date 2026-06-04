@@ -6,6 +6,8 @@ updates:
       interval: "monthly"
       time: "09:00"
       timezone: "Europe/Paris"
+    cooldown:
+      default-days: 5
     labels:
       - "dependencies"
       - "ci"
