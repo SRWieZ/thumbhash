@@ -202,23 +202,29 @@ class Thumbhash
         $w = round($ratio > 1 ? 32 : 32 * $ratio);
         $h = round($ratio > 1 ? 32 / $ratio : 32);
         $rgba = [];
-        $fx = [];
-        $fy = [];
+
+        // Precompute the coefficients: they only depend on either x or y
+        $fxs = [];
+        for ($x = 0, $n = max($lx, $hasAlpha ? 5 : 3); $x < $w; $x++) {
+            for ($cx = 0; $cx < $n; $cx++) {
+                $fxs[$x][$cx] = cos(M_PI / $w * ($x + 0.5) * $cx);
+            }
+        }
+        $fys = [];
+        for ($y = 0, $n = max($ly, $hasAlpha ? 5 : 3); $y < $h; $y++) {
+            for ($cy = 0; $cy < $n; $cy++) {
+                $fys[$y][$cy] = cos(M_PI / $h * ($y + 0.5) * $cy);
+            }
+        }
 
         for ($y = 0, $i = 0; $y < $h; $y++) {
+            $fy = $fys[$y];
             for ($x = 0; $x < $w; $x++, $i += 4) {
+                $fx = $fxs[$x];
                 $l = $l_dc;
                 $p = $p_dc;
                 $q = $q_dc;
                 $a = $a_dc;
-
-                // Precompute the coefficients
-                for ($cx = 0, $n = max($lx, $hasAlpha ? 5 : 3); $cx < $n; $cx++) {
-                    $fx[$cx] = cos(M_PI / $w * ($x + 0.5) * $cx);
-                }
-                for ($cy = 0, $n = max($ly, $hasAlpha ? 5 : 3); $cy < $n; $cy++) {
-                    $fy[$cy] = cos(M_PI / $h * ($y + 0.5) * $cy);
-                }
 
                 // Decode L
                 for ($cy = 0, $j = 0; $cy < $ly; $cy++) {
