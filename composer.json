@@ -28,7 +28,11 @@
   "require-dev": {
     "pestphp/pest": "^1.0|^2.0|^3.0|^4.0",
     "ext-imagick": "*",
-    "ext-gd": "*"
+    "ext-gd": "*",
+    "phpbench/phpbench": "^1.2"
+  },
+  "scripts": {
+    "bench": "phpbench run --report=aggregate"
   },
   "config": {
     "allow-plugins": {

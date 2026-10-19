@@ -16,4 +16,5 @@ composer.lock
 /logs/
 /cache/
 .phpunit.result.cache
+/.phpbench/
 
