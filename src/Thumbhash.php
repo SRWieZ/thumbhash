@@ -102,18 +102,31 @@ class Thumbhash
         $dc = 0;
         $ac = [];
         $scale = 0;
-        $fx = [];
+
+        $rows = [];
+        for ($cx = 0; $cx < $nx; $cx++) {
+            $fx = [];
+            for ($x = 0; $x < $w; $x++) {
+                $fx[$x] = cos(pi() / $w * $cx * ($x + 0.5));
+            }
+            for ($y = 0, $i = 0; $y < $h; $y++) {
+                $sum = 0;
+                for ($x = 0; $x < $w; $x++, $i++) {
+                    $sum += $channel[$i] * $fx[$x];
+                }
+                $rows[$cx][$y] = $sum;
+            }
+        }
 
         for ($cy = 0; $cy < $ny; $cy++) {
+            $fy = [];
+            for ($y = 0; $y < $h; $y++) {
+                $fy[$y] = cos(pi() / $h * $cy * ($y + 0.5));
+            }
             for ($cx = 0; $cx * $ny < $nx * ($ny - $cy); $cx++) {
                 $f = 0;
-                for ($x = 0; $x < $w; $x++) {
-                    $fx[$x] = cos(pi() / $w * $cx * ($x + 0.5));
-                }
                 for ($y = 0; $y < $h; $y++) {
-                    for ($x = 0, $fy = cos(pi() / $h * $cy * ($y + 0.5)); $x < $w; $x++) {
-                        $f += $channel[$x + $y * $w] * $fx[$x] * $fy;
-                    }
+                    $f += $rows[$cx][$y] * $fy[$y];
                 }
                 $f /= $w * $h;
                 if ($cx || $cy) {
@@ -125,7 +138,7 @@ class Thumbhash
             }
         }
         if ($scale) {
-            for ($i = 0; $i < count($ac); $i++) {
+            for ($i = 0, $n = count($ac); $i < $n; $i++) {
                 $ac[$i] = 0.5 + 0.5 / $scale * $ac[$i];
             }
         }
