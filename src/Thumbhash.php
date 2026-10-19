@@ -343,64 +343,29 @@ class Thumbhash
     public static function rgbaToDataURL(int $w, int $h, $rgba)
     {
         $row = $w * 4 + 1;
-        $idat = 6 + $h * (5 + $row);
-        $bytes = [
-            137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0,
-            $w >> 8, $w & 255, 0, 0, $h >> 8, $h & 255, 8, 6, 0, 0, 0, 0, 0, 0, 0,
-            ($idat >> 24) & 0xFF, ($idat >> 16) & 255, ($idat >> 8) & 255, $idat & 255,
-            73, 68, 65, 84, 120, 1
-        ];
-        $table = [
-            0, 498536548, 997073096, 651767980, 1994146192, 1802195444, 1303535960,
-            1342533948, -306674912, -267414716, -690576408, -882789492, -1687895376,
-            -2032938284, -1609899400, -1111625188
-        ];
-        $a = 1;
-        $b = 0;
-        $y = 0;
-        $i = 0;
-        $end = $row - 1;
+        $raw = '';
+        $deflate = "\x78\x01"; // zlib header
 
-        for (; $y < $h; $y++, $end += $row - 1) {
-            array_push($bytes, ($y + 1 < $h ? 0 : 1), $row & 255, $row >> 8, ~$row & 255, ($row >> 8) ^ 255, 0);
-
-            for ($b = ($b + $a) % 65521; $i < $end; $i++) {
-                $u = intval($rgba[$i]) & 255;
-                $bytes[] = $u;
-                $a = ($a + $u) % 65521;
-                $b = ($b + $a) % 65521;
-            }
+        // One uncompressed ("stored") deflate block per scanline
+        for ($y = 0; $y < $h; $y++) {
+            $line = "\0" . pack('C*', ...array_map('intval', array_slice($rgba, $y * $w * 4, $w * 4)));
+            $deflate .= pack('Cvv', $y + 1 < $h ? 0 : 1, $row, ~$row & 0xFFFF) . $line;
+            $raw .= $line;
         }
+        $deflate .= pack('N', hexdec(hash('adler32', $raw)));
 
-        array_push($bytes,
-            $b >> 8, $b & 255, $a >> 8, $a & 255, 0, 0, 0, 0,
-            0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130
-        );
+        $png = "\x89PNG\r\n\x1a\n"
+            . static::pngChunk('IHDR', pack('NNC5', $w, $h, 8, 6, 0, 0, 0))
+            . static::pngChunk('IDAT', $deflate)
+            . static::pngChunk('IEND', '');
 
-        $ranges = [[12, 29], [37, 41 + $idat]];
-
-        foreach ($ranges as $range) {
-            $start = $range[0];
-            $end = $range[1];
-            $c = ~0;
-
-            for ($i = $start; $i < $end; $i++) {
-                $c ^= $bytes[$i];
-                $c = (($c >> 4) & 0xFFFFFFF) ^ $table[$c & 15];
-                $c = (($c >> 4) & 0xFFFFFFF) ^ $table[$c & 15];
-            }
-
-            $c = ~$c;
-            $bytes[$end++] = ($c >> 24) & 0xFF;
-            $bytes[$end++] = ($c >> 16) & 255;
-            $bytes[$end++] = ($c >> 8) & 255;
-            $bytes[$end++] = $c & 255;
-        }
-
-
-        return 'data:image/png;base64,' . base64_encode(implode('', array_map('chr', $bytes)));
+        return 'data:image/png;base64,' . base64_encode($png);
     }
 
+    protected static function pngChunk(string $type, string $data): string
+    {
+        return pack('N', strlen($data)) . $type . $data . pack('N', crc32($type . $data));
+    }
 
     /**
      * Decodes a ThumbHash to a PNG data URL. This is a convenience function that
